@@ -1,0 +1,68 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Data.SqlClient;
+using System.IO;
+
+
+namespace WindowsFormsApplication2
+{
+    public partial class Addfaculty : Form
+    {
+        public Addfaculty()
+        {
+            InitializeComponent();
+        }
+
+        private void Addfaculty_Load(object sender, EventArgs e)
+        {
+            // TODO: This line of code loads data into the 'gHSDataSet1.addstudent1' table. You can move, or remove it, as needed.
+            this.addstudent1TableAdapter.Fill(this.gHSDataSet1.addstudent1);
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            
+            SqlConnection con = new SqlConnection("Data Source=SHWETHA-PC;Initial Catalog=GHS;Integrated Security=True");
+            SqlCommand cmd = new SqlCommand("insert into addfaculty11(prefix,name,phone,email,imagepath) values(@prefix,@name,@phone,@email,@imagepath)");
+
+            cmd.Connection = con;
+            cmd.CommandType = CommandType.Text;
+            MemoryStream stream = new MemoryStream();
+            pictureBox1.Image.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
+            byte[] pic = stream.ToArray();
+            cmd.Parameters.AddWithValue("@prefix", textBox1.Text);
+           
+            cmd.Parameters.AddWithValue("@name", textBox2.Text);
+            cmd.Parameters.AddWithValue("@phone", textBox3.Text);
+           
+            cmd.Parameters.AddWithValue("@email", textBox4.Text);
+
+            cmd.Parameters.AddWithValue("@imagepath", pic);
+            con.Open();
+           
+            cmd.ExecuteNonQuery();
+            con.Close();
+        }
+
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.Filter = "jpg|*.jpg";
+            DialogResult res = openFileDialog1.ShowDialog();
+            if (res == DialogResult.OK)
+            {
+                pictureBox1.Image = Image.FromFile(openFileDialog1.FileName);
+            }
+        }
+
+       
+    }
+}

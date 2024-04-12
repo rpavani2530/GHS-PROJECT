@@ -1,0 +1,117 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Data.SqlClient;
+namespace WindowsFormsApplication2
+{
+    public partial class feedetails : Form
+    {
+        public feedetails()
+        {
+            InitializeComponent();
+        }
+
+        private void feedetails_Load(object sender, EventArgs e)
+        {
+            // TODO: This line of code loads data into the 'gHSDataSet7.studentfeedetails' table. You can move, or remove it, as needed.
+            this.studentfeedetailsTableAdapter.Fill(this.gHSDataSet7.studentfeedetails);
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            SqlConnection con = new SqlConnection("Data Source=SHWETHA-PC;Initial Catalog=GHS;Integrated Security=True");
+            SqlCommand cmd = new SqlCommand("insert into studentfeedetails (date,admissionno,name,class,totalamount,paidamount,dueamount) values(@date,@admissionno,@name,@class,@totalamount,@paidamount,@dueamount)");
+
+            cmd.Connection = con;
+            cmd.CommandType = CommandType.Text;
+
+            cmd.Parameters.AddWithValue("@date", dateTimePicker1.Text);
+            cmd.Parameters.AddWithValue("@admissionno", textBox1.Text);
+            cmd.Parameters.AddWithValue("@name", textBox3.Text);
+            cmd.Parameters.AddWithValue("@class", textBox2.Text);
+            cmd.Parameters.AddWithValue("@totalamount", textBox4.Text);
+            cmd.Parameters.AddWithValue("@paidamount", textBox5.Text);
+            cmd.Parameters.AddWithValue("@dueamount", textBox6.Text);
+            con.Open();
+            cmd.ExecuteNonQuery();
+            con.Close();
+            grid();
+            label1.Text = "SUCCESSFULLY INSERTED";
+            dateTimePicker1.Text = textBox1.Text = textBox3.Text = textBox2.Text = textBox4.Text = textBox5.Text = textBox6.Text = "";
+            label9.Text = "success";
+        }
+        public void grid()
+        {
+
+            SqlConnection con = new SqlConnection("Data Source=SHWETHA-PC;Initial Catalog=GHS;Integrated Security=True");
+            SqlCommand cmd = new SqlCommand("select * from studentfeedetails");
+            cmd.Connection = con;
+            con.Open();
+            SqlDataAdapter adp = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            adp.Fill(dt);
+            dataGridView1.DataSource = dt;
+            cmd.ExecuteNonQuery();
+            con.Close();
+        }
+
+     //   private void textBox1_TextChanged(object sender, EventArgs e)
+      //  {
+
+        //    details();
+       // }
+        public DataSet details()
+        {
+            SqlConnection con = new SqlConnection("Data Source=SHWETHA-PC;Initial Catalog=GHS;Integrated Security=True");
+            SqlCommand cmd = new SqlCommand("select * from addstudent1 where admissionno ='" + textBox1.Text + "'", con);
+            DataSet ds = new DataSet();
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            con.Open();
+            da.Fill(ds, "addstudent1");
+            cmd.ExecuteNonQuery();
+            textBox3.Text = ds.Tables["addstudent1"].Rows[0]["name"].ToString();
+            textBox2.Text = ds.Tables["addstudent1"].Rows[0]["class"].ToString();
+            con.Close();
+            return ds;
+        }
+        private DataSet bind()
+        {
+            SqlConnection con = new SqlConnection("Data Source=SHWETHA-PC;Initial Catalog=GHS;Integrated Security=True");
+            SqlCommand cmd = new SqlCommand("select * from feestructure where class='" + textBox2.Text + "'", con);
+            DataSet ds = new DataSet();
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+
+            da.Fill(ds, "feestructure");
+            con.Open();
+            cmd.ExecuteNonQuery();
+            textBox4.Text = ds.Tables["feestructure"].Rows[0]["totalamount"].ToString();
+            con.Close();
+            return ds;
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            bind();
+        }
+
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+          //  if (!string.IsNullOrEmpty(textBox4.Text) && !string.IsNullOrEmpty(textBox5.Text))
+            textBox6.Text =( (int.Parse(textBox4.Text) - int.Parse(textBox5.Text))).ToString();
+        
+        }
+
+        private void textBox1_Leave(object sender, EventArgs e)
+        {
+            details();
+        }
+
+    }
+}

@@ -1,0 +1,68 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Data.SqlClient;
+
+namespace WindowsFormsApplication2
+{
+    public partial class Viewstudent : Form
+    {
+        public Viewstudent()
+        {
+            InitializeComponent();
+           
+                
+           
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            search();
+        }
+
+        private void search()
+        {
+            SqlConnection con = new SqlConnection("Data Source=SHWETHA-PC;Initial Catalog=GHS;Integrated Security=True");
+            string str = "select * from addstudent1 where(id like '%' + @search + '%')";
+            SqlCommand cmd = new SqlCommand(str, con);
+            cmd.Connection = con;
+
+            //  SqlConnection con = new SqlConnection(connection);
+
+            cmd.Parameters.Add("@search", SqlDbType.NVarChar).Value = textBox1.Text;
+            con.Open();
+            cmd.ExecuteNonQuery();
+            SqlDataAdapter da = new SqlDataAdapter();
+            da.SelectCommand = cmd;
+            DataTable dt = new DataTable();
+           // DataSet ds = new DataSet();
+            da.Fill(dt);
+            dataGridView1.DataSource = dt;
+
+            con.Close();
+        }
+
+       
+
+        private void linkLabel5_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Viewstudent obj1 = new Viewstudent();
+            obj1.Show();
+            this.Hide();
+        }
+
+        private void Viewstudent_Load(object sender, EventArgs e)
+        {
+            // TODO: This line of code loads data into the 'gHSDataSet3.addstudent1' table. You can move, or remove it, as needed.
+            this.addstudent1TableAdapter1.Fill(this.gHSDataSet3.addstudent1);
+            search();
+
+        }
+    }
+}
